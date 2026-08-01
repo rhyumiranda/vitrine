@@ -1,0 +1,10 @@
+{
+  "title": "Vitrine",
+  "subtitle": "point it at a project — get a real demo",
+  "logo": null,
+  "accent": "#7c5cff",
+  "background": "#0b0d12",
+  "intro_ms": 1700,
+  "outro_ms": 2400,
+  "outro_cta": "github.com/rhyumiranda/vitrine"
+}

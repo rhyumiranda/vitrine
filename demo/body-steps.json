@@ -1,0 +1,48 @@
+{
+  "type": "cli",
+  "theme": "Catppuccin Mocha",
+  "font_size": 22,
+  "width": 1200,
+  "height": 760,
+  "typing_speed_ms": 55,
+  "output": {
+    "mp4": "body.mp4"
+  },
+  "setup": [
+    "export PATH=/w/canopy/bin:$PATH",
+    "cd /tmp && rm -rf proj && mkdir proj && cd proj && git init -q && git config user.email demo@vitrine.dev && git config user.name demo && canopy init >/dev/null 2>&1",
+    "clear"
+  ],
+  "steps": [
+    {
+      "cmd": "canopy task add 'Wire up OAuth login'",
+      "wait": "added task t1",
+      "pause_ms": 800
+    },
+    {
+      "cmd": "canopy task add 'Fix flaky payment test'",
+      "wait": "added task t2",
+      "pause_ms": 800
+    },
+    {
+      "cmd": "canopy task add 'Ship README demo GIF'",
+      "wait": "added task t3",
+      "pause_ms": 1000
+    },
+    {
+      "cmd": "canopy task status t1 implementing",
+      "wait": "status=implementing",
+      "pause_ms": 800
+    },
+    {
+      "cmd": "canopy task status t2 reviewing",
+      "wait": "status=reviewing",
+      "pause_ms": 1000
+    },
+    {
+      "cmd": "canopy status",
+      "wait": "Ship README",
+      "pause_ms": 3000
+    }
+  ]
+}

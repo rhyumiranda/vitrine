@@ -9,3 +9,6 @@ out/
 demo.tape
 project.json
 steps.json
+
+# ...but keep the committed demo GIFs shown in the README
+!demo/*.gif

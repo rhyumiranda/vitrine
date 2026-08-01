@@ -2,6 +2,21 @@
 
 **Point it at a project. Get back a demo of the real thing actually being used.**
 
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="demo/cli.gif" alt="Vitrine CLI demo — a real terminal tool being driven" width="100%"><br>
+      <sub><b>CLI path</b> — real terminal, real output</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="demo/web.gif" alt="Vitrine web demo — cinematic zoom-on-click over a real web page" width="100%"><br>
+      <sub><b>Web path</b> — cinematic zoom-on-click</sub>
+    </td>
+  </tr>
+</table>
+
+<sub>Both clips were produced by Vitrine itself — logo/CTA bookends added by the compositor; everything between is the real product.</sub>
+
 Vitrine analyzes a repo, figures out how the product is actually used, then *drives the real running product* and records it — a real animated terminal for CLIs, a cinematic zoom-on-click video for web apps. The UI in the output is the genuine product, its own design system, exactly as shipped. Nothing is mocked.
 
 MIT-licensed. Local-first. Built on [`vhs`](https://github.com/charmbracelet/vhs), [Playwright](https://playwright.dev), [Remotion](https://remotion.dev), and Claude Code.
