@@ -1,0 +1,11 @@
+node_modules/
+compositor/node_modules/
+compositor/public/
+compositor/out/
+out/
+*.webm
+*.mp4
+*.gif
+demo.tape
+project.json
+steps.json
