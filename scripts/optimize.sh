@@ -12,8 +12,12 @@ width="${4:-1000}"
 
 command -v ffmpeg  >/dev/null || { echo "ffmpeg not found on PATH"  >&2; exit 1; }
 
-palette="$(mktemp -t demo-palette-XXXXXX.png)"
-trap 'rm -f "$palette"' EXIT
+# Use a temp *dir* + fixed .png name: portable across GNU/BSD mktemp, and keeps
+# the .png extension ffmpeg needs to pick the PNG muxer. (A `.png` suffix on an
+# `mktemp -t` template is invalid on GNU mktemp and misplaced on macOS.)
+palette_dir="$(mktemp -d)"
+palette="$palette_dir/palette.png"
+trap 'rm -rf "$palette_dir"' EXIT
 
 # stats_mode=diff favors moving regions (typing/scrolling) for a sharper palette.
 ffmpeg -y -i "$in" \

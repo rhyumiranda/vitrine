@@ -91,7 +91,10 @@ def emit(lines: list[str], steps: dict) -> None:
         if step.get("wait_line"):
             add(f"Wait+Line /{step['wait_line']}/")
         elif step.get("wait"):
-            add(f"Wait /{step['wait']}/")
+            # Screen scope: match the regex anywhere on screen. VHS's bare `Wait`
+            # defaults to Line scope (last line only), which misses text that
+            # scrolled up in multi-line output — the common case for `wait`.
+            add(f"Wait+Screen /{step['wait']}/")
         add(f"Sleep {step.get('pause_ms', 1500)}ms")
         add("")
 
