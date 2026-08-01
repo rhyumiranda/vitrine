@@ -1,0 +1,10 @@
+{
+  "title": "mytool",
+  "subtitle": "ship demos in one command",
+  "logo": null,
+  "accent": "#7c5cff",
+  "background": "#0b0d12",
+  "intro_ms": 1600,
+  "outro_ms": 2200,
+  "outro_cta": "github.com/you/mytool"
+}

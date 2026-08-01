@@ -1,0 +1,18 @@
+{
+  "type": "cli",
+  "theme": "Catppuccin Mocha",
+  "font_size": 22,
+  "width": 1200,
+  "height": 640,
+  "typing_speed_ms": 60,
+  "output": { "gif": "demo.gif", "mp4": "demo.mp4" },
+  "require": ["git"],
+  "setup": ["cd /tmp && rm -rf demo-repo && mkdir demo-repo && cd demo-repo", "clear"],
+  "cleanup": ["cd /tmp && rm -rf demo-repo"],
+  "steps": [
+    { "cmd": "git init", "wait": "Initialized", "pause_ms": 1200 },
+    { "cmd": "echo 'hello' > README.md && git add .", "pause_ms": 800 },
+    { "cmd": "git commit -m 'first commit'", "wait": "first commit", "pause_ms": 1800 },
+    { "cmd": "git log --oneline", "wait_line": "first commit", "pause_ms": 2500 }
+  ]
+}

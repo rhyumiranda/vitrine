@@ -1,0 +1,15 @@
+{
+  "type": "web",
+  "url": "http://localhost:3000",
+  "viewport": { "width": 2560, "height": 1440 },
+  "device_scale_factor": 2,
+  "steps": [
+    { "action": "goto", "url": "/" },
+    { "action": "click", "selector": "text=Get started", "pause_ms": 900 },
+    { "action": "type", "selector": "input[name=email]", "text": "demo@example.com", "delay_ms": 60 },
+    { "action": "type", "selector": "input[name=password]", "text": "hunter2", "delay_ms": 60 },
+    { "action": "click", "selector": "button[type=submit]", "pause_ms": 500 },
+    { "action": "wait", "selector": "text=Dashboard", "timeout_ms": 10000 },
+    { "action": "scroll", "dy": 700, "pause_ms": 1200 }
+  ]
+}
