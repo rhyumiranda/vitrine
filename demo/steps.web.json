@@ -1,64 +1,15 @@
 {
   "type": "web",
   "url": "http://127.0.0.1:8899",
-  "viewport": {
-    "width": 1440,
-    "height": 900
-  },
+  "viewport": { "width": 1440, "height": 900 },
   "device_scale_factor": 2,
   "steps": [
-    {
-      "action": "goto",
-      "url": "/"
-    },
-    {
-      "action": "wait",
-      "ms": 900
-    },
-    {
-      "action": "click",
-      "selector": "h2:has-text('Goal')",
-      "pause_ms": 1300
-    },
-    {
-      "action": "scroll",
-      "dy": 900,
-      "pause_ms": 800
-    },
-    {
-      "action": "click",
-      "selector": "h2:has-text('Proposed architecture')",
-      "pause_ms": 1300
-    },
-    {
-      "action": "scroll",
-      "dy": 950,
-      "pause_ms": 800
-    },
-    {
-      "action": "click",
-      "selector": "h2:has-text('Path A')",
-      "pause_ms": 1300
-    },
-    {
-      "action": "scroll",
-      "dy": 1100,
-      "pause_ms": 800
-    },
-    {
-      "action": "click",
-      "selector": "h2:has-text('Path B')",
-      "pause_ms": 1300
-    },
-    {
-      "action": "scroll",
-      "dy": 1200,
-      "pause_ms": 800
-    },
-    {
-      "action": "click",
-      "selector": "h2:has-text('Decisions')",
-      "pause_ms": 1600
-    }
+    { "action": "goto", "url": "/" },
+    { "action": "wait", "ms": 1100 },
+    { "action": "click", "selector": "#tab-90", "pause_ms": 1500 },
+    { "action": "click", "selector": "#nav-customers", "pause_ms": 1700 },
+    { "action": "click", "selector": "#btn-new-report", "pause_ms": 1100 },
+    { "action": "type", "selector": "#report-name", "text": "Q3 revenue review", "delay_ms": 52, "pause_ms": 800 },
+    { "action": "click", "selector": "#btn-create", "pause_ms": 1600 }
   ]
 }

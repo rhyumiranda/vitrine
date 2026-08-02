@@ -9,8 +9,8 @@
       <sub><b>CLI path</b> — real terminal, real output</sub>
     </td>
     <td width="50%" align="center">
-      <img src="demo/web.gif" alt="Vitrine web demo — cinematic zoom-on-click over a real web page" width="100%"><br>
-      <sub><b>Web path</b> — cinematic zoom-on-click</sub>
+      <img src="demo/web.gif" alt="Vitrine web demo — cinematic zoom-on-click driving a real analytics dashboard" width="100%"><br>
+      <sub><b>Web path</b> — held zoom + follow-cursor, driving a real app</sub>
     </td>
   </tr>
 </table>

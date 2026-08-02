@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Meridian — revenue analytics</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --ink:#0f172a; --muted:#64748b; --line:#e6e9f2;
+    --card:#ffffff; --side:#0f1628; --side-ink:#cdd5e6; --side-mut:#7f8aa6;
+    --accent:#5b5bf0; --accent-soft:#ececfe; --pos:#10b981; --neg:#ef4444;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 12px 28px -18px rgba(15,23,42,.22);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--ink); display:flex; height:100vh; overflow:hidden;
+    font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ---------- sidebar ---------- */
+  aside{width:246px;flex:none;background:var(--side);color:var(--side-ink);
+    display:flex;flex-direction:column;padding:22px 16px;gap:6px}
+  .brand{display:flex;align-items:center;gap:11px;padding:6px 10px 20px}
+  .brand .glyph{width:32px;height:32px;border-radius:9px;flex:none;
+    background:conic-gradient(from 210deg,#7c7cff,#5b5bf0,#8f6bff);
+    box-shadow:0 6px 18px rgba(91,91,240,.5)}
+  .brand b{font-size:18px;letter-spacing:-.02em;color:#fff;font-weight:700}
+  .navlabel{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--side-mut);
+    padding:14px 12px 6px}
+  .nav{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;
+    color:var(--side-ink);font-size:14.5px;font-weight:500;cursor:pointer;user-select:none}
+  .nav svg{width:18px;height:18px;flex:none;opacity:.85}
+  .nav:hover{background:#ffffff10}
+  .nav.active{background:var(--accent);color:#fff}
+  .nav.active svg{opacity:1}
+  .side-foot{margin-top:auto;display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;background:#ffffff0d}
+  .avatar{width:30px;height:30px;border-radius:50%;flex:none;background:linear-gradient(135deg,#f0a,#5b5bf0)}
+  .side-foot .who{font-size:13px;color:#fff;font-weight:600;line-height:1.2}
+  .side-foot .who small{display:block;color:var(--side-mut);font-weight:400}
+
+  /* ---------- main ---------- */
+  main{flex:1;display:flex;flex-direction:column;min-width:0}
+  header{display:flex;align-items:center;gap:18px;padding:20px 30px;border-bottom:1px solid var(--line);background:#fff}
+  header h1{font-size:20px;margin:0;letter-spacing:-.02em}
+  header .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .search{margin-left:auto;display:flex;align-items:center;gap:9px;background:var(--bg);
+    border:1px solid var(--line);border-radius:10px;padding:9px 13px;color:var(--muted);font-size:13.5px;min-width:220px}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;
+    background:var(--accent);color:#fff;box-shadow:0 6px 16px -6px rgba(91,91,240,.7)}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+
+  .scroll{padding:26px 30px;overflow:auto;flex:1}
+  .view{display:none} .view.on{display:block}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow)}
+  .kpi .k{color:var(--muted);font-size:13px;font-weight:500}
+  .kpi .v{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:8px}
+  .delta{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;margin-top:9px;
+    padding:2px 8px;border-radius:999px}
+  .delta.up{color:var(--pos);background:#dcfce7}
+  .delta.down{color:var(--neg);background:#fee2e2}
+
+  /* chart card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-top:20px}
+  .card .head{display:flex;align-items:center;gap:14px;padding:18px 20px 6px}
+  .card .head h3{margin:0;font-size:16px;letter-spacing:-.01em}
+  .tabs{margin-left:auto;display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .tab{border:none;background:none;padding:6px 13px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+  .tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.12)}
+  .chart{padding:6px 12px 16px}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+    padding:12px 20px;border-bottom:1px solid var(--line)}
+  tbody td{padding:14px 20px;border-bottom:1px solid var(--line)}
+  tbody tr:last-child td{border-bottom:none}
+  .who2{display:flex;align-items:center;gap:11px}
+  .dot{width:30px;height:30px;border-radius:9px;flex:none;background:linear-gradient(135deg,#c7d2fe,#a5b4fc)}
+  .who2 b{font-weight:600} .who2 small{color:var(--muted);display:block;font-weight:400}
+  .pill{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
+  .pill.active{color:var(--pos);background:#dcfce7} .pill.trial{color:#b45309;background:#fef3c7}
+  .pill.churn{color:var(--neg);background:#fee2e2}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(15,23,42,.42);backdrop-filter:blur(2px);
+    display:none;align-items:center;justify-content:center;z-index:20}
+  .scrim.on{display:flex}
+  .modal{width:460px;background:#fff;border-radius:16px;box-shadow:0 30px 80px -20px rgba(15,23,42,.5);overflow:hidden}
+  .modal .mhead{padding:20px 22px 4px} .modal h2{margin:0;font-size:18px;letter-spacing:-.01em}
+  .modal p{margin:6px 0 0;color:var(--muted);font-size:13.5px}
+  .field{padding:14px 22px 4px}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px}
+  .field input,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:14px;
+    color:var(--ink);background:#fff;outline:none}
+  .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .mfoot{display:flex;justify-content:flex-end;gap:10px;padding:18px 22px 20px}
+</style>
+</head>
+<body>
+  <aside>
+    <div class="brand"><div class="glyph"></div><b>Meridian</b></div>
+    <div class="navlabel">Workspace</div>
+    <div class="nav active" data-view="overview" id="nav-overview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Overview</div>
+    <div class="nav" data-view="customers" id="nav-customers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 010 5.8M21 20c0-2.5-1.4-4.4-3.5-5.2"/></svg> Customers</div>
+    <div class="nav" data-view="overview" id="nav-revenue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5m0 14h16M8 16l3.5-4 3 2.5L20 8"/></svg> Revenue</div>
+    <div class="nav" data-view="overview" id="nav-reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> Reports</div>
+    <div class="navlabel">Account</div>
+    <div class="nav" data-view="overview" id="nav-settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 00-1.7-1L14.5 3h-4l-.3 2a7 7 0 00-1.7 1l-2.4-1-2 3.4L4 10a7 7 0 000 2l-2 1.6 2 3.4 2.4-1a7 7 0 001.7 1l.3 2h4l.3-2a7 7 0 001.7-1l2.4 1 2-3.4-2-1.6a7 7 0 00.2-1z"/></svg> Settings</div>
+    <div class="side-foot"><div class="avatar"></div><div class="who">Ava Chen<small>ava@meridian.io</small></div></div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <h1 id="page-title">Overview</h1>
+        <div class="sub" id="page-sub">Revenue performance · last 30 days</div>
+      </div>
+      <div class="search">🔎 Search metrics, customers…</div>
+      <button class="btn" id="btn-new-report">＋ New report</button>
+    </header>
+
+    <div class="scroll">
+      <!-- OVERVIEW -->
+      <section class="view on" id="view-overview">
+        <div class="kpis">
+          <div class="kpi" id="kpi-mrr"><div class="k">Monthly recurring revenue</div><div class="v num">$248,910</div><span class="delta up">▲ 12.4%</span></div>
+          <div class="kpi"><div class="k">Active customers</div><div class="v num">3,428</div><span class="delta up">▲ 4.1%</span></div>
+          <div class="kpi"><div class="k">Net revenue retention</div><div class="v num">114%</div><span class="delta up">▲ 2.0%</span></div>
+          <div class="kpi"><div class="k">Churn rate</div><div class="v num">1.8%</div><span class="delta down">▼ 0.3%</span></div>
+        </div>
+
+        <div class="card">
+          <div class="head">
+            <div><h3>Revenue over time</h3></div>
+            <div class="tabs">
+              <button class="tab" data-range="7" id="tab-7">7d</button>
+              <button class="tab active" data-range="30" id="tab-30">30d</button>
+              <button class="tab" data-range="90" id="tab-90">90d</button>
+            </div>
+          </div>
+          <div class="chart"><svg id="spark" viewBox="0 0 900 260" width="100%" height="260" preserveAspectRatio="none"></svg></div>
+        </div>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section class="view" id="view-customers">
+        <div class="card" style="margin-top:2px">
+          <table>
+            <thead><tr><th>Customer</th><th>Plan</th><th class="num">MRR</th><th>Status</th></tr></thead>
+            <tbody id="cust-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- modal -->
+  <div class="scrim" id="scrim">
+    <div class="modal" role="dialog" aria-label="New report">
+      <div class="mhead"><h2>New report</h2><p>Build a shareable view from your live metrics.</p></div>
+      <div class="field"><label>Report name</label><input id="report-name" placeholder="e.g. Q3 revenue review" /></div>
+      <div class="field"><label>Data source</label>
+        <select><option>Revenue</option><option>Customers</option><option>Retention cohorts</option></select></div>
+      <div class="mfoot"><button class="btn ghost" id="btn-cancel">Cancel</button><button class="btn" id="btn-create">Create report</button></div>
+    </div>
+  </div>
+
+<script>
+  // ---- interactivity (a real app being used) ----
+  const $ = (s)=>document.querySelector(s);
+  const views = { overview:{t:"Overview",s:"Revenue performance · last 30 days"},
+                  customers:{t:"Customers",s:"3,428 active accounts"} };
+  document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>{
+    document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
+    n.classList.add('active');
+    const v = n.dataset.view;
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+    $('#view-'+v).classList.add('on');
+    $('#page-title').textContent = views[v].t;
+    $('#page-sub').textContent = views[v].s;
+  }));
+
+  // customers table
+  const custs = [
+    ["Northwind Traders","north","Enterprise","$18,400","active"],
+    ["Globex Corp","glob","Growth","$7,250","active"],
+    ["Initech","init","Growth","$5,900","trial"],
+    ["Umbra Labs","umbr","Starter","$1,240","active"],
+    ["Soylent Foods","soyl","Enterprise","$22,800","active"],
+    ["Hooli","hool","Growth","$6,100","churn"],
+  ];
+  $('#cust-rows').innerHTML = custs.map(c=>`<tr>
+    <td><div class="who2"><div class="dot"></div><div><b>${c[0]}</b><small>${c[1]}.example.com</small></div></div></td>
+    <td>${c[2]}</td><td class="num">${c[3]}</td>
+    <td><span class="pill ${c[4]}">${c[4][0].toUpperCase()+c[4].slice(1)}</span></td></tr>`).join('');
+
+  // chart
+  function series(n, seed){ let v=60, out=[]; for(let i=0;i<n;i++){ v += Math.sin(i/2+seed)*6 + (Math.random()*10-3); v=Math.max(20,Math.min(180,v)); out.push(v);} return out; }
+  function draw(range){
+    const n = range==7?7:range==90?90:30;
+    const data = series(n, range);
+    const W=900,H=260,pad=8;
+    const max=Math.max(...data), min=Math.min(...data);
+    const xs=(i)=> pad + i*(W-2*pad)/(n-1);
+    const ys=(v)=> H-10 - (v-min)/(max-min+1e-6)*(H-40);
+    let d="", area="";
+    data.forEach((v,i)=>{ const x=xs(i),y=ys(v); d+=(i?"L":"M")+x+" "+y+" "; });
+    area = d + `L ${xs(n-1)} ${H} L ${xs(0)} ${H} Z`;
+    $('#spark').innerHTML =
+      `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5b5bf0" stop-opacity=".28"/><stop offset="1" stop-color="#5b5bf0" stop-opacity="0"/></linearGradient></defs>
+       <path d="${area}" fill="url(#g)"/>
+       <path d="${d}" fill="none" stroke="#5b5bf0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+       <circle cx="${xs(n-1)}" cy="${ys(data[n-1])}" r="5" fill="#5b5bf0" stroke="#fff" stroke-width="2.5"/>`;
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active'); draw(+t.dataset.range);
+  }));
+  draw(30);
+
+  // modal
+  $('#btn-new-report').addEventListener('click',()=>$('#scrim').classList.add('on'));
+  $('#btn-cancel').addEventListener('click',()=>$('#scrim').classList.remove('on'));
+  $('#btn-create').addEventListener('click',()=>$('#scrim').classList.remove('on'));
+</script>
+</body>
+</html>
