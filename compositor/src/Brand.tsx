@@ -11,6 +11,7 @@ import {
 } from "remotion";
 import { loadFont as loadDisplay } from "@remotion/google-fonts/Fraunces";
 import { loadFont as loadMono } from "@remotion/google-fonts/JetBrainsMono";
+import { loadFont as loadNewsreader } from "@remotion/google-fonts/Newsreader";
 
 // Type = the brand's voice. Fraunces is an editorial display serif — the
 // "boutique display case" half of *vitrine* (French for shop window). JetBrains
@@ -18,6 +19,12 @@ import { loadFont as loadMono } from "@remotion/google-fonts/JetBrainsMono";
 // onto a developer's real work.
 const DISPLAY = loadDisplay("normal", { weights: ["400", "600"], subsets: ["latin"] }).fontFamily;
 const MONO = loadMono("normal", { weights: ["500"], subsets: ["latin"] }).fontFamily;
+const NEWSREADER = loadNewsreader("normal", { weights: ["500"], subsets: ["latin"] }).fontFamily;
+
+// Optional per-brand title font override (defaults to the DISPLAY serif).
+function titleFamily(brand: BrandConfig): string {
+  return brand.title_font === "Newsreader" ? NEWSREADER : DISPLAY;
+}
 
 export type BrandConfig = {
   title?: string;
@@ -29,6 +36,8 @@ export type BrandConfig = {
   intro_ms?: number; // 0 → no intro
   outro_ms?: number; // 0 → no outro
   outro_cta?: string;
+  title_font?: string; // e.g. "Newsreader"; defaults to the DISPLAY serif
+  title_weight?: number; // title font weight; defaults to 600
 };
 
 export const DEFAULT_BRAND: Required<
@@ -135,10 +144,10 @@ export const Intro: React.FC<{ brand: BrandConfig }> = ({ brand }) => {
         {brand.title && (
           <div
             style={{
-              fontFamily: DISPLAY,
+              fontFamily: titleFamily(brand),
               color: "#fff",
               fontSize: 78,
-              fontWeight: 600,
+              fontWeight: brand.title_weight ?? 600,
               letterSpacing: "-0.02em",
               lineHeight: 1,
               opacity: appear,
@@ -188,7 +197,7 @@ export const Outro: React.FC<{ brand: BrandConfig }> = ({ brand }) => {
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {brand.emoji && <div style={{ fontSize: 46, lineHeight: 1 }}>{brand.emoji}</div>}
           {brand.title && (
-            <div style={{ fontFamily: DISPLAY, color: "#fff", fontSize: 62, fontWeight: 600, letterSpacing: "-0.02em" }}>
+            <div style={{ fontFamily: titleFamily(brand), color: "#fff", fontSize: 62, fontWeight: brand.title_weight ?? 600, letterSpacing: "-0.02em" }}>
               {brand.title}
             </div>
           )}

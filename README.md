@@ -1,21 +1,27 @@
 # 🪟 Vitrine
 
-**Point it at a project. Get back a demo of the real thing actually being used.**
+**Turn any repo into a polished product demo — a live terminal or a cinematic web video, generated as code. Nothing mocked.**
+
+<p align="center">
+  <img src="demo/hero.gif" alt="Vitrine in Claude Code: ask it to record a demo, the skill runs the pipeline, and hands back a finished video" width="90%">
+</p>
+
+<p align="center"><sub>Open Claude Code in any project and say <b>“record a demo of this project.”</b> Vitrine detects the stack, drives the real running product, and hands back the video.</sub></p>
+
+**It produces two flavors — each is the *real* product, only the outer camera is ours:**
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="demo/cli.gif" alt="Vitrine CLI demo — a real terminal tool being driven" width="100%"><br>
-      <sub><b>CLI path</b> — real terminal, real output</sub>
+      <img src="demo/cli.gif" alt="Vitrine CLI output — a real terminal tool being driven" width="100%"><br>
+      <sub><b>CLI</b> — a real animated terminal: typing, commands, live output</sub>
     </td>
     <td width="50%" align="center">
-      <img src="demo/web.gif" alt="Vitrine web demo — cinematic zoom-on-click driving a real analytics dashboard" width="100%"><br>
-      <sub><b>Web path</b> — held zoom + follow-cursor, driving a real app</sub>
+      <img src="demo/web.gif" alt="Vitrine web output — held zoom + follow-cursor over a real analytics app" width="100%"><br>
+      <sub><b>Web</b> — held zoom that pans between clicks + a follow-cursor</sub>
     </td>
   </tr>
 </table>
-
-<sub>Both clips were produced by Vitrine itself — logo/CTA bookends added by the compositor; everything between is the real product.</sub>
 
 Vitrine analyzes a repo, figures out how the product is actually used, then *drives the real running product* and records it — a real animated terminal for CLIs, a cinematic zoom-on-click video for web apps. The UI in the output is the genuine product, its own design system, exactly as shipped. Nothing is mocked.
 
@@ -46,7 +52,7 @@ Vitrine takes the recording off your plate:
 
 - **It uses the real product.** The pixels in the demo are the genuine UI — its own design system, running live. No mocks, no restyling.
 - **It figures out the steps.** It reads manifests, `--help`, and the README to infer a compelling 15–30s happy path for *this* repo.
-- **It's animated, with real timing.** Terminal: characters type out, commands run, output streams, deliberate pauses. Web: the camera eases into each click and the cursor glides between targets (the Screen Studio / Recordly look) — all generated as code, headless.
+- **It's animated, with real timing.** Terminal: characters type out, commands run, output streams, deliberate pauses. Web: the camera pushes into a click and *holds* — panning between nearby clicks instead of zooming out each time — while a spring-smoothed cursor follows the pointer and pops on click (the Screen Studio / Recordly look), all generated as code, headless.
 - **It's branded.** Optional animated intro logo/title and outro CTA, as timed bookends.
 - **It's safe.** Capture and render run inside Docker on a copy of the repo; only read-only commands auto-run, and it asks before anything that builds, installs, or mutates state.
 - **It's two formats.** A sharp MP4 for anywhere that takes video, and a size-optimized GIF for READMEs.
@@ -68,7 +74,7 @@ The missing piece was a lean layer that ties inference to rendering. That's Vitr
 | **Source of truth** | mockup / slide / stale GIF | the real product, running live |
 | **Effort** | record, re-record, edit | one command (or "record a demo") |
 | **Terminal demo** | static or badly paced | typed out, real output, real timing |
-| **Web demo** | flat screen capture | cinematic zoom-on-click + eased cursor |
+| **Web demo** | flat screen capture | held zoom that pans between clicks + a follow-cursor |
 | **Branding** | added by hand in an editor | animated intro/outro as code |
 | **Staying current** | manual redo each release | re-run; it re-derives the steps |
 
@@ -129,7 +135,7 @@ bash scripts/optimize.sh branded.mp4 demo.gif  # ffmpeg palette + gifsicle, < ~2
 - `scripts/detect.py` — repo → `project.json` (read-only; parses manifests + README).
 - `scripts/render_tape.py` — `steps.json` → a VHS `.tape` (CLI path).
 - `scripts/capture_web.mjs` — Playwright drives the real web app, records an oversampled `raw.webm`, and logs exact click coords + timing to `events.json`.
-- `compositor/` — a Remotion project that adds the cinematic zoom/cursor layer (web) and the animated intro/outro (both paths).
+- `compositor/` — a Remotion project that adds the animated intro/outro (both paths) and the cinematic camera for web. The held-zoom + follow-cursor motion (`compositor/src/motion.ts`) is an analytic damped-spring track: clicks cluster into one held zoom that pans between them, and the cursor is spring-smoothed to follow the real pointer.
 - `scripts/optimize.sh` — two-pass ffmpeg palette + gifsicle for a light GIF.
 
 Depth lives in [`references/`](references) (VHS, web-cinematic, optimize, steps-schema), loaded only when needed.
