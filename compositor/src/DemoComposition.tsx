@@ -1,15 +1,14 @@
 import React from "react";
 import {
   AbsoluteFill,
-  Easing,
   OffthreadVideo,
   Sequence,
-  interpolate,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
 import { Intro, Outro, type BrandConfig } from "./Brand";
+import { buildMotion, type MotionEvent } from "./motion";
 
 export type DemoEvent = {
   type: "click" | "cursor" | "scroll";
@@ -44,56 +43,6 @@ export type DemoProps = {
   outroFrames: number;
 };
 
-const CURSOR_EASE = Easing.bezier(0.22, 1, 0.36, 1);
-
-function cameraAt(
-  frame: number,
-  clicks: { f: number; x: number; y: number }[],
-  cam: DemoProps["camera"],
-): { zoom: number; fx: number; fy: number } {
-  if (clicks.length === 0) return { zoom: 1, fx: 0.5, fy: 0.5 };
-  let active: { f: number; x: number; y: number } | null = null;
-  for (const c of clicks) {
-    const end = c.f + cam.holdFrames + cam.zoomOutFrames;
-    if (frame >= c.f - cam.zoomInFrames && frame <= end) active = c;
-  }
-  if (!active) return { zoom: 1, fx: 0.5, fy: 0.5 };
-  const inStart = active.f - cam.zoomInFrames;
-  const holdEnd = active.f + cam.holdFrames;
-  const outEnd = holdEnd + cam.zoomOutFrames;
-  const zoom = interpolate(
-    frame,
-    [inStart, active.f, holdEnd, outEnd],
-    [1, cam.zoom, cam.zoom, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) },
-  );
-  return { zoom, fx: active.x, fy: active.y };
-}
-
-function cursorAt(
-  frame: number,
-  pts: { f: number; x: number; y: number }[],
-): { x: number; y: number; pressing: boolean } | null {
-  if (pts.length === 0) return null;
-  if (frame <= pts[0].f) return { x: pts[0].x, y: pts[0].y, pressing: false };
-  for (let i = 0; i < pts.length - 1; i++) {
-    const a = pts[i];
-    const b = pts[i + 1];
-    if (frame >= a.f && frame <= b.f) {
-      const travel = Math.max(1, b.f - a.f - 6);
-      const p = interpolate(frame, [a.f, a.f + travel], [0, 1], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-        easing: CURSOR_EASE,
-      });
-      const pressing = frame >= b.f - 3 && frame <= b.f + 4;
-      return { x: a.x + (b.x - a.x) * p, y: a.y + (b.y - a.y) * p, pressing };
-    }
-  }
-  const last = pts[pts.length - 1];
-  return { x: last.x, y: last.y, pressing: false };
-}
-
 function videoSrc(video: string): string {
   return /^https?:\/\//.test(video) ? video : staticFile(video);
 }
@@ -108,64 +57,64 @@ const CliBody: React.FC<DemoProps> = (props) => {
   );
 };
 
-/** Web body: real capture + cinematic zoom-on-click + eased cursor. */
+/** Web body: real capture + Screen-Studio-style held zoom, gliding pan, and a
+ *  cursor that truly follows the pointer (all via the spring track in motion.ts). */
 const WebBody: React.FC<DemoProps> = (props) => {
   const frame = useCurrentFrame();
-  const { width, height, fps } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useVideoConfig();
   const { events, meta, camera } = props;
 
-  const sx = width / meta.viewport.width;
-  const sy = height / meta.viewport.height;
-  const toFrame = (ms: number) => Math.round((ms / 1000) * fps);
-
-  const clicks = events
-    .filter((e) => e.type === "click" || e.type === "cursor")
-    .map((e) => ({ f: toFrame(e.t), x: e.x * sx, y: e.y * sy }));
-  const targets = clicks.filter(
-    (c, i) =>
-      i === 0 ||
-      Math.abs(c.f - clicks[i - 1].f) > 2 ||
-      Math.hypot(c.x - clicks[i - 1].x, c.y - clicks[i - 1].y) > 4,
+  // Integrate the whole camera + cursor track once, then index by frame.
+  const track = React.useMemo(
+    () =>
+      buildMotion({
+        events: events as MotionEvent[],
+        viewport: meta.viewport,
+        outWidth: width,
+        outHeight: height,
+        fps,
+        frames: durationInFrames,
+        depth: camera.zoom,
+      }),
+    [events, meta.viewport, width, height, fps, durationInFrames, camera.zoom],
   );
 
-  const clicksForCam = targets.map((c) => ({ f: c.f, x: c.x / width, y: c.y / height }));
-  const { zoom, fx, fy } = cameraAt(frame, clicksForCam, camera);
-
-  const focalX = fx * width;
-  const focalY = fy * height;
-  const tx = width / 2 - focalX * zoom;
-  const ty = height / 2 - focalY * zoom;
-
-  const cur = cursorAt(frame, targets);
-  const curScreenX = cur ? cur.x * zoom + tx : 0;
-  const curScreenY = cur ? cur.y * zoom + ty : 0;
-  const press = cur?.pressing ? 0.82 : 1;
+  const m = track[Math.min(frame, track.length - 1)];
+  if (!m) {
+    return (
+      <AbsoluteFill style={{ backgroundColor: camera.background }}>
+        <OffthreadVideo src={videoSrc(props.video)} style={{ width, height, objectFit: "fill" }} />
+      </AbsoluteFill>
+    );
+  }
 
   return (
     <AbsoluteFill style={{ backgroundColor: camera.background }}>
-      <AbsoluteFill style={{ transform: `translate(${tx}px, ${ty}px) scale(${zoom})`, transformOrigin: "0 0" }}>
+      <AbsoluteFill
+        style={{ transform: `translate(${m.tx}px, ${m.ty}px) scale(${m.scale})`, transformOrigin: "0 0" }}
+      >
         <OffthreadVideo src={videoSrc(props.video)} style={{ width, height, objectFit: "fill" }} />
       </AbsoluteFill>
-      {cur && (
+      {m.cursorVisible && (
         <div
           style={{
             position: "absolute",
-            left: curScreenX,
-            top: curScreenY,
-            width: 26,
-            height: 26,
-            transform: `translate(-4px, -2px) scale(${press})`,
-            transformOrigin: "0 0",
+            left: m.cursorX,
+            top: m.cursorY,
+            width: 30,
+            height: 30,
+            transform: `translate(-5px, -3px) scale(${m.bounce})`,
+            transformOrigin: "6px 4px",
             pointerEvents: "none",
-            filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.35))",
+            filter: "drop-shadow(0 3px 5px rgba(0,0,0,0.4))",
           }}
         >
-          <svg viewBox="0 0 24 24" width="26" height="26">
+          <svg viewBox="0 0 24 24" width="30" height="30">
             <path
               d="M4 2 L4 20 L9 15 L12.5 22 L15 21 L11.5 14 L18 14 Z"
               fill="#fff"
-              stroke="#111"
-              strokeWidth="1.3"
+              stroke="#141414"
+              strokeWidth="1.4"
               strokeLinejoin="round"
             />
           </svg>

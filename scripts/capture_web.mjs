@@ -74,6 +74,20 @@ await page.addInitScript(() => {
     window.__demoRec &&
     window.__demoRec({ type, x, y, t: performance.now(), scrollY: window.scrollY });
   addEventListener("pointerdown", (e) => send("click", e.clientX, e.clientY), true);
+  // Continuous cursor PATH: throttled mousemove so the compositor can ease a
+  // cursor that truly follows the pointer (Screen-Studio look), not just teleport
+  // between click targets. ~28ms ≈ 36Hz — plenty to smooth against in post.
+  let lastMove = 0;
+  addEventListener(
+    "mousemove",
+    (e) => {
+      const t = performance.now();
+      if (t - lastMove < 28) return;
+      lastMove = t;
+      send("move", e.clientX, e.clientY);
+    },
+    true,
+  );
   let st;
   addEventListener(
     "scroll",
