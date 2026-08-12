@@ -91,7 +91,19 @@ Not built for: recording arbitrary desktop apps, or narrated explainer videos (i
 
 **Prereqs:** [Docker](https://www.docker.com) (for the CLI/VHS render) · [Node 18+](https://nodejs.org) (for web capture + intro/outro) · [`ffmpeg`](https://ffmpeg.org) + [`gifsicle`](https://www.lcdf.org/gifsicle/) (for the optimized GIF) · [Claude Code](https://code.claude.com/docs).
 
-**Install once:**
+**Install once** — one command copies the skill into `~/.claude/skills/vitrine`, installs the compositor deps, and fetches Playwright + a Chromium build, then tells you if `ffmpeg`/`gifsicle`/`docker` are missing:
+```bash
+npx github:rhyumiranda/vitrine            # global, all projects
+# npx github:rhyumiranda/vitrine --project  # into ./.claude/skills instead
+```
+Then pull the CLI render engine and the GIF tools (the installer reports these; it won't install system packages for you):
+```bash
+docker pull ghcr.io/charmbracelet/vhs     # CLI/terminal render engine
+brew install ffmpeg gifsicle              # or: apt-get install ffmpeg gifsicle
+```
+
+<details><summary>Manual install (if you'd rather not use the installer)</summary>
+
 ```bash
 git clone https://github.com/rhyumiranda/vitrine.git && cd vitrine
 ln -s "$PWD" ~/.claude/skills/vitrine        # activate the skill
@@ -101,6 +113,7 @@ npm i playwright && npx playwright install chromium
 brew install ffmpeg gifsicle                 # GIF optimization
 bash scripts/check_deps.sh                   # verify everything's present
 ```
+</details>
 
 **The easy way** — open Claude Code inside the project you want a demo of, and say:
 ```
