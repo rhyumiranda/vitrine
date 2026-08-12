@@ -104,8 +104,11 @@ const mkSpring = (): Spring => ({ value: 0, velocity: 0, init: false });
 
 // zoom/pan spring — smoothness 0.5 (ζ≈1.05, glides, no wobble)
 const ZOOM_CFG: SpringCfg = { stiffness: 100, damping: 21, mass: 1, restDelta: 0.0005, restSpeed: 0.015 };
-// cursor spring — "smooth" preset band (over-damped, elegant follow)
-const CURSOR_CFG: SpringCfg = { stiffness: 329, damping: 82, mass: 1.8, restDelta: 0.0002, restSpeed: 0.01 };
+// cursor spring — LIGHT tracking (ζ≈0.9): the captured path is already a human
+// arc/min-jerk trajectory, so the spring only interpolates frame-to-frame. Heavy
+// over-damping here would flatten the human motion (and make the cursor lag so it
+// clicks "near" not "on" — the classic over-smoothed/robotic tell).
+const CURSOR_CFG: SpringCfg = { stiffness: 900, damping: 54, mass: 1, restDelta: 0.0002, restSpeed: 0.01 };
 
 // ---- cubic-bezier (matches CSS cubic-bezier) --------------------------------
 function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
@@ -279,8 +282,11 @@ export function buildMotion(input: MotionInput): Frame[] {
     // glide the cursor toward its telemetry target, then project through camera
     const cx = step(sCx, target.x, dtMs, CURSOR_CFG);
     const cy = step(sCy, target.y, dtMs, CURSOR_CFG);
-    const cursorX = cx * scale + tx;
-    const cursorY = cy * scale + ty;
+    // Keep the cursor inside the frame: during a fast pan its camera-projected
+    // position can briefly land just past an edge, which reads as the cursor
+    // "leaving" the shot. Clamp with a small margin so it always stays visible.
+    const cursorX = Math.min(W - 4, Math.max(4, cx * scale + tx));
+    const cursorY = Math.min(H - 4, Math.max(4, cy * scale + ty));
 
     // click bounce
     let bounce = 1;
