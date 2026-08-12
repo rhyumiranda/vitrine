@@ -2,8 +2,9 @@
 /**
  * vitrine installer — makes the skill install correctly, every time.
  *
- *   npx github:rhyumiranda/vitrine          # install globally for all projects
- *   npx github:rhyumiranda/vitrine --project # install into ./.claude/skills
+ *   npx vitrine-skill            # install globally for all projects
+ *   npx vitrine-skill --project # install into ./.claude/skills
+ *   npx github:rhyumiranda/vitrine   # same, straight from the repo (no publish needed)
  *
  * The manual install is a six-step dance (clone, symlink into the right dir,
  * npm install the compositor, install playwright + a chromium build, install
@@ -28,7 +29,8 @@ const FORCE = has("--force");
 const SKIP_DEPS = has("--skip-deps");
 if (has("-h") || has("--help")) {
   console.log(`vitrine installer
-  npx github:rhyumiranda/vitrine [--project] [--dir <path>] [--skip-deps] [--force]
+  npx vitrine-skill [--project] [--dir <path>] [--skip-deps] [--force]
+  (or: npx github:rhyumiranda/vitrine — straight from the repo)
 
   --project    install into ./.claude/skills/vitrine (default: ~/.claude/skills/vitrine)
   --dir <path> install into an explicit directory

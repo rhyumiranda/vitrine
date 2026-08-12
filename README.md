@@ -93,8 +93,9 @@ Not built for: recording arbitrary desktop apps, or narrated explainer videos (i
 
 **Install once** — one command copies the skill into `~/.claude/skills/vitrine`, installs the compositor deps, and fetches Playwright + a Chromium build, then tells you if `ffmpeg`/`gifsicle`/`docker` are missing:
 ```bash
-npx github:rhyumiranda/vitrine            # global, all projects
-# npx github:rhyumiranda/vitrine --project  # into ./.claude/skills instead
+npx vitrine-skill                         # global, all projects
+# npx vitrine-skill --project             # into ./.claude/skills instead
+# npx github:rhyumiranda/vitrine          # same, straight from the repo
 ```
 Then pull the CLI render engine and the GIF tools (the installer reports these; it won't install system packages for you):
 ```bash
