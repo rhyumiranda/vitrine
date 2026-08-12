@@ -1,0 +1,26 @@
+{
+  "name": "vitrine-skill",
+  "version": "0.1.0",
+  "description": "Installer for the vitrine Claude Code skill — records real, humanlike product demos (CLI terminal + cinematic web).",
+  "type": "module",
+  "bin": {
+    "vitrine-install": "scripts/install.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "SKILL.md",
+    "AGENTS.md",
+    "LICENSE",
+    "scripts",
+    "compositor",
+    "references",
+    "examples"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhyumiranda/vitrine.git"
+  },
+  "license": "MIT"
+}
