@@ -14,9 +14,14 @@
     "AGENTS.md",
     "LICENSE",
     "scripts",
-    "compositor",
     "references",
-    "examples"
+    "examples",
+    "compositor/src",
+    "compositor/render.mjs",
+    "compositor/package.json",
+    "compositor/package-lock.json",
+    "compositor/tsconfig.json",
+    "compositor/remotion.config.ts"
   ],
   "repository": {
     "type": "git",
