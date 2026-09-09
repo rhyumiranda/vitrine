@@ -1,177 +1,174 @@
-# 🪟 Vitrine
-
-**Turn any repo into a polished product demo — a live terminal or a cinematic web video, generated as code. Nothing mocked.**
+<h1 align="center">Vitrine</h1>
 
 <p align="center">
-  <img src="demo/hero.gif" alt="Vitrine in Claude Code: ask it to record a demo, the skill runs the pipeline, and hands back a finished video" width="90%">
+  Record a real product demo from any repository, as a polished MP4 and README-ready GIF.
 </p>
 
-<p align="center"><sub>Open Claude Code in any project and say <b>“record a demo of this project.”</b> Vitrine detects the stack, drives the real running product, and hands back the video.</sub></p>
+<p align="center">
+  <a href="https://www.npmjs.com/package/vitrine-skill">
+    <img src="https://img.shields.io/npm/v/vitrine-skill" alt="npm version">
+  </a>
+  <a href="https://github.com/rhyumiranda/vitrine/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/rhyumiranda/vitrine" alt="MIT License">
+  </a>
+  <a href="https://nodejs.org/">
+    <img src="https://img.shields.io/badge/node-%3E%3D18-339933" alt="Node.js 18 or later">
+  </a>
+</p>
 
-**It produces two flavors — each is the *real* product, only the outer camera is ours:**
+<p align="center">
+  <img src="demo/hero.gif" alt="Vitrine records a real product demo from Claude Code" width="90%">
+</p>
+
+Vitrine is an agent skill that studies a repository, chooses a short real workflow, drives the running product, and records it. The pixels in the demo belong to the product you built. Vitrine only adds the outer camera, framing, cursor motion, and optional branded bookends.
+
+It supports two paths:
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="demo/cli.gif" alt="Vitrine CLI output — a real terminal tool being driven" width="100%"><br>
-      <sub><b>CLI</b> — a real animated terminal: typing, commands, live output</sub>
+      <img src="demo/cli.gif" alt="A Vitrine terminal demo showing live CLI output" width="100%"><br>
+      <sub><b>CLI</b> - a typed, animated terminal running the real command.</sub>
     </td>
     <td width="50%" align="center">
-      <img src="demo/web.gif" alt="Vitrine web output — held zoom + follow-cursor over a real analytics app" width="100%"><br>
-      <sub><b>Web</b> — held zoom that pans between clicks + a follow-cursor</sub>
+      <img src="demo/web.gif" alt="A Vitrine web demo with held zoom and a follow cursor over a real app" width="100%"><br>
+      <sub><b>Web</b> - a real browser session with cinematic held zoom and cursor motion.</sub>
     </td>
   </tr>
 </table>
 
-Vitrine analyzes a repo, figures out how the product is actually used, then *drives the real running product* and records it — a real animated terminal for CLIs, a cinematic zoom-on-click video for web apps. The UI in the output is the genuine product, its own design system, exactly as shipped. Nothing is mocked.
+## Start here
 
-MIT-licensed. Local-first. Built on [`vhs`](https://github.com/charmbracelet/vhs), [Playwright](https://playwright.dev), [Remotion](https://remotion.dev), and Claude Code.
+**You need:** Node.js 18+, `ffmpeg`, and `gifsicle`. CLI demos also need Docker; web demos need the Playwright Chromium download. The installer prepares the skill, Playwright, and the compositor, then reports any missing system tools.
 
----
+Install the published skill for all Claude Code projects:
 
-## What is Vitrine?
-
-A demo-video generator that runs *above* your project. You point it at a repo; it detects whether the project is a CLI or a web app, infers a short, believable usage story, performs those steps against the real product, and records an animated demo — `demo.mp4` for marketing plus an optimized `demo.gif` for your README. Optional animated intro (logo/title) and outro (title + CTA) bookend the result.
-
-The name is French for a shop window — the display case that shows your product working behind glass.
-
-## The problem
-
-Making a good product demo is manual, fiddly work:
-
-- You screen-record yourself, fluff a take, and re-record. Again.
-- The "demo" drifts from the product — a mockup, a slide, a stale GIF.
-- Terminal casts are static or badly paced; web recordings look flat with no focus.
-- Every release, the demo is out of date and nobody wants to redo it.
-
-The product is right there and working. Capturing *that*, well, is the annoying part.
-
-## The solution
-
-Vitrine takes the recording off your plate:
-
-- **It uses the real product.** The pixels in the demo are the genuine UI — its own design system, running live. No mocks, no restyling.
-- **It figures out the steps.** It reads manifests, `--help`, and the README to infer a compelling 15–30s happy path for *this* repo.
-- **It's animated, with real timing.** Terminal: characters type out, commands run, output streams, deliberate pauses. Web: the camera pushes into a click and *holds* — panning between nearby clicks instead of zooming out each time — while a spring-smoothed cursor follows the pointer and pops on click (the Screen Studio / Recordly look), all generated as code, headless.
-- **It's branded.** Optional animated intro logo/title and outro CTA, as timed bookends.
-- **It's safe.** Capture and render run inside Docker on a copy of the repo; only read-only commands auto-run, and it asks before anything that builds, installs, or mutates state.
-- **It's two formats.** A sharp MP4 for anywhere that takes video, and a size-optimized GIF for READMEs.
-
-## Why now?
-
-Three things line up:
-
-1. **Agents can read a repo** and infer how it's meant to be used — the "what should the demo show" step that used to need a human.
-2. **Terminal-as-code (VHS) and video-as-code (Remotion)** make deterministic, repeatable, headless renders possible — no fragile screen capture, no GUI app in the loop.
-3. **Headless Chromium + Playwright** can drive a real web app with no display server, so the whole pipeline runs in a container.
-
-The missing piece was a lean layer that ties inference to rendering. That's Vitrine.
-
-## Before & after
-
-| | Before | With Vitrine |
-|---|---|---|
-| **Source of truth** | mockup / slide / stale GIF | the real product, running live |
-| **Effort** | record, re-record, edit | one command (or "record a demo") |
-| **Terminal demo** | static or badly paced | typed out, real output, real timing |
-| **Web demo** | flat screen capture | held zoom that pans between clicks + a follow-cursor |
-| **Branding** | added by hand in an editor | animated intro/outro as code |
-| **Staying current** | manual redo each release | re-run; it re-derives the steps |
-
-## Where to use it
-
-- **Any git repo** — a CLI tool or a web app.
-- **README GIFs, launch videos, changelog clips, landing-page loops.**
-- **Docker available** for safe, dependency-bundled capture + render.
-- Works across all your projects: install once, run per repo.
-
-Not built for: recording arbitrary desktop apps, or narrated explainer videos (it shows the product, it doesn't talk over it).
-
-## How to use it
-
-**Prereqs:** [Docker](https://www.docker.com) (for the CLI/VHS render) · [Node 18+](https://nodejs.org) (for web capture + intro/outro) · [`ffmpeg`](https://ffmpeg.org) + [`gifsicle`](https://www.lcdf.org/gifsicle/) (for the optimized GIF) · [Claude Code](https://code.claude.com/docs).
-
-**Install once** — one command copies the skill into `~/.claude/skills/vitrine`, installs the compositor deps, and fetches Playwright + a Chromium build, then tells you if `ffmpeg`/`gifsicle`/`docker` are missing:
-```bash
-npx vitrine-skill                         # global, all projects
-# npx vitrine-skill --project             # into ./.claude/skills instead
-# npx github:rhyumiranda/vitrine          # same, straight from the repo
-```
-Then pull the CLI render engine and the GIF tools (the installer reports these; it won't install system packages for you):
-```bash
-docker pull ghcr.io/charmbracelet/vhs     # CLI/terminal render engine
-brew install ffmpeg gifsicle              # or: apt-get install ffmpeg gifsicle
+```sh
+npx --yes --package=vitrine-skill vitrine-install
 ```
 
-<details><summary>Manual install (if you'd rather not use the installer)</summary>
+Or install directly from this repository:
 
-```bash
-git clone https://github.com/rhyumiranda/vitrine.git && cd vitrine
-ln -s "$PWD" ~/.claude/skills/vitrine        # activate the skill
-docker pull ghcr.io/charmbracelet/vhs        # CLI render engine
-(cd compositor && npm install)               # web/intro/outro compositor (Remotion)
-npm i playwright && npx playwright install chromium
-brew install ffmpeg gifsicle                 # GIF optimization
-bash scripts/check_deps.sh                   # verify everything's present
+```sh
+npx github:rhyumiranda/vitrine
 ```
-</details>
 
-**The easy way** — open Claude Code inside the project you want a demo of, and say:
+For a project-local installation, append `--project` to either command. The installer does not install system packages; on macOS:
+
+```sh
+brew install ffmpeg gifsicle
+docker pull ghcr.io/charmbracelet/vhs  # needed for CLI demos
 ```
+
+Then open Claude Code in the repository you want to show and ask:
+
+```text
 record a demo of this project
 ```
-Vitrine detects CLI vs web, infers the steps, runs them against the real product, and produces `demo.mp4` + `demo.gif`. It asks before running anything that builds or mutates state, and asks what to put in the intro/outro.
 
-**Under the hood** — the raw pipeline the skill drives (you rarely run these by hand):
-```bash
-# 1. Understand the repo
-python3 scripts/detect.py . > project.json     # cli | web | unknown + entrypoints
+Vitrine detects whether the project is a CLI or web app, proposes a 15-30 second storyline, asks before any build or mutating command, then writes an MP4 and optimized GIF from the real run.
 
-# 2a. CLI demo (real animated terminal via VHS)
-python3 scripts/render_tape.py steps.json > demo.tape
-docker run --rm -v "$PWD":/vhs -w /vhs ghcr.io/charmbracelet/vhs demo.tape
-node compositor/render.mjs demo.mp4 branded.mp4 --mode cli --brand brand.json
+## What makes a Vitrine demo different
 
-# 2b. Web demo (cinematic zoom/cursor via Playwright + Remotion)
-node scripts/capture_web.mjs steps.json out    # drives the real app, logs clicks + timing
-node compositor/render.mjs out/raw.webm out/events.json demo.mp4 --brand brand.json
+| Ordinary recording | Vitrine |
+| --- | --- |
+| A manual take that drifts from the product | Real commands and the real running UI |
+| A flat terminal capture | Typed commands, streamed output, and intentional pacing |
+| A raw web capture | Held zoom between nearby clicks and a human-like follow cursor |
+| A mockup or edited stand-in | The product's existing design system and data flow |
+| A one-off artifact | A code-defined workflow you can record again after a release |
 
-# 3. Optimize for a README
-bash scripts/optimize.sh branded.mp4 demo.gif  # ffmpeg palette + gifsicle, < ~2MB
+Vitrine is for software product demos, README GIFs, launch clips, and landing-page loops. It is not a general desktop recorder or a narrated explainer-video tool.
+
+## The workflow
+
+```text
+detect repository -> understand real behavior -> propose storyline -> confirm -> capture -> compose -> optimize
 ```
 
-`steps.json` is the storyline (what to type / click) and `brand.json` is the optional intro/outro — see [`references/steps-schema.md`](references/steps-schema.md) and the [`examples/`](examples).
+1. **Detect**: reads manifests and the README to identify a CLI, web app, or unknown project.
+2. **Understand**: checks actual help output, routes, and entry points before writing a story.
+3. **Propose**: creates a short `steps.json` based on real actions.
+4. **Confirm**: shows the storyline and asks before builds, installs, writes, or other side effects.
+5. **Capture**: records either a VHS terminal session or a Playwright browser session.
+6. **Compose**: adds optional intro/outro and the cinematic web camera through Remotion.
+7. **Optimize**: creates a small GIF alongside the MP4.
 
-## How it works
+The skill uses the repository as the source of truth. It does not redraw, restyle, or fake the app being demonstrated.
 
-**The inference lives in the skill; the rendering is reused.** [`SKILL.md`](SKILL.md) is the workflow Claude follows (detect → understand → infer → confirm → capture → composite → optimize). The deterministic pieces are small scripts:
+## What gets generated
 
-- `scripts/detect.py` — repo → `project.json` (read-only; parses manifests + README).
-- `scripts/render_tape.py` — `steps.json` → a VHS `.tape` (CLI path).
-- `scripts/capture_web.mjs` — Playwright drives the real web app, records an oversampled `raw.webm`, and logs exact click coords + timing to `events.json`.
-- `compositor/` — a Remotion project that adds the animated intro/outro (both paths) and the cinematic camera for web. The held-zoom + follow-cursor motion (`compositor/src/motion.ts`) is an analytic damped-spring track: clicks cluster into one held zoom that pans between them, and the cursor is spring-smoothed to follow the real pointer.
-- `scripts/optimize.sh` — two-pass ffmpeg palette + gifsicle for a light GIF.
+| File | Purpose |
+| --- | --- |
+| `steps.json` | The real actions and waits that make up the story. |
+| `brand.json` | Optional title, logo, and call-to-action bookends. |
+| `demo.mp4` | The high-quality product demo. |
+| `demo.gif` | A GIF optimized for a README or issue. |
 
-Depth lives in [`references/`](references) (VHS, web-cinematic, optimize, steps-schema), loaded only when needed.
+See [steps-schema.md](references/steps-schema.md), [brand.json](examples/brand.json), and the [examples](examples/) for the exact formats.
 
-## Contributing
+## Run the pipeline yourself
 
-Early and rough — plenty to sharpen (open an issue to see what's in flight).
+The skill is the recommended interface. These commands are useful when authoring or debugging a demo locally:
 
-**How the code is organized:**
-- `SKILL.md` — the workflow (the *behavior* Claude follows).
-- `scripts/*` — deterministic glue: `detect.py`, `render_tape.py`, `capture_web.mjs`, `optimize.sh`, `check_deps.sh`.
-- `compositor/` — the Remotion video project (`render.mjs` + `src/`).
-- `references/*.md`, `examples/*` — reference docs and sample `steps.json` / `brand.json`.
+```sh
+# Read only: classify the repository and collect likely entry points.
+python3 scripts/detect.py . > project.json
 
-**Ground rules (please keep these true):**
-- **Real product, always.** The demo records the genuine running UI — never a mock or a restyle. Only the outer *camera* (background, window frame, zoom, cursor) is ours.
-- **Deterministic-first.** If a plain script can do it, don't spend an agent. Judgment goes to the skill prompt; guarantees go to the scripts.
-- **Safe by default.** Capture/render runs sandboxed; only read-only commands auto-run; anything with side effects asks first.
-- **Prefer real output over guessed timing.** Sync on the tool's actual output (`Wait /regex/`, Playwright waits), not fixed sleeps.
+# Verify which dependencies each path needs.
+bash scripts/check_deps.sh all
+```
 
-**Sending a change:** open an issue for anything non-trivial first, keep PRs atomic, and explain the *what* and *why*.
+For a CLI demo, create a story and render it through VHS:
+
+```sh
+python3 scripts/render_tape.py steps.json project.json > demo.tape
+docker run --rm -v "$PWD":/vhs -w /vhs ghcr.io/charmbracelet/vhs demo.tape
+```
+
+For a web demo, capture the real browser session and compose it:
+
+```sh
+node scripts/capture_web.mjs steps.json out
+node compositor/render.mjs out/raw.webm out/events.json demo.mp4 --brand brand.json
+```
+
+Optimize an MP4 for README use:
+
+```sh
+bash scripts/optimize.sh demo.mp4 demo.gif
+```
+
+## Safety
+
+Vitrine may run project code to show the product working. Its intended operating model is conservative:
+
+- Capture and rendering run in Docker on a copy of the target repository where practical.
+- Read-only commands can be inspected automatically; builds, installs, writes, and other side effects require confirmation.
+- Every capture action and wait has a timeout.
+- If a web app needs authentication or production data, provide a seeded test account or a safe route. Vitrine does not invent credentials.
+
+## Project map
+
+| Path | Responsibility |
+| --- | --- |
+| [SKILL.md](SKILL.md) | Agent workflow, safety rules, and decisions. |
+| `scripts/detect.py` | Read-only project detection. |
+| `scripts/render_tape.py` | `steps.json` to VHS tape for CLI demos. |
+| `scripts/capture_web.mjs` | Playwright capture and click/timing events for web demos. |
+| `compositor/` | Remotion intro/outro and web camera composition. |
+| `scripts/optimize.sh` | MP4 to optimized GIF conversion. |
+| `references/` | Detailed formats and rendering notes. |
+
+## Development
+
+```sh
+npm pack --dry-run
+bash scripts/check_deps.sh all
+```
+
+Use the demo fixtures in `demo/` to exercise the CLI and web paths without another repository.
 
 ## License
 
-MIT © Rhyu Miranda. See [`LICENSE`](LICENSE).
+[MIT](LICENSE) Copyright 2026 Rhyu Miranda
