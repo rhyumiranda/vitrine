@@ -39,21 +39,21 @@ It supports two paths:
 
 ## Start here
 
-**You need:** Node.js 18+, `ffmpeg`, and `gifsicle`. CLI demos also need Docker; web demos need the Playwright Chromium download. The installer prepares the skill, Playwright, and the compositor, then reports any missing system tools.
+**You need:** Node.js 18+, `ffmpeg`, and `gifsicle`. CLI demos also need Docker; web demos need the Playwright Chromium download.
 
-Install the published skill for all Claude Code projects:
-
-```sh
-npx --yes --package=vitrine-skill vitrine-install
-```
-
-Or install directly from this repository:
+Install Vitrine for all your agents:
 
 ```sh
-npx github:rhyumiranda/vitrine
+npx skills add rhyumiranda/vitrine --skill vitrine -g
 ```
 
-For a project-local installation, append `--project` to either command. The installer does not install system packages; on macOS:
+For just the current project:
+
+```sh
+npx skills add rhyumiranda/vitrine --skill vitrine --project
+```
+
+`skills add` installs the skill files only. On its first demo, Vitrine checks the runtime, explains any needed package install and Chromium download, and asks before proceeding. Install system packages separately; on macOS:
 
 ```sh
 brew install ffmpeg gifsicle

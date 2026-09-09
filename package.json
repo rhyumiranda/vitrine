@@ -13,13 +13,18 @@
     "SKILL.md",
     "AGENTS.md",
     "LICENSE",
-    "scripts",
+    "scripts/bootstrap.mjs",
+    "scripts/capture_web.mjs",
+    "scripts/check_deps.sh",
+    "scripts/detect.py",
+    "scripts/install.mjs",
+    "scripts/optimize.sh",
+    "scripts/render_tape.py",
     "references",
     "examples",
     "compositor/src",
     "compositor/render.mjs",
     "compositor/package.json",
-    "compositor/package-lock.json",
     "compositor/tsconfig.json",
     "compositor/remotion.config.ts"
   ],
@@ -27,5 +32,8 @@
     "type": "git",
     "url": "git+https://github.com/rhyumiranda/vitrine.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
 }

@@ -32,8 +32,15 @@ detect → understand → infer storyline → capture (real run) → composite �
 
 ## Dependencies
 
-Everything runs inside Docker (chosen runtime) so deps are bundled and untrusted
-project code is contained.
+`npx skills add rhyumiranda/vitrine --skill vitrine -g` installs the skill source,
+not its Node packages or Chromium. Before a first capture, run
+`node scripts/bootstrap.mjs --check` from the installed skill directory. If it
+reports missing runtime parts, explain that setup will run `npm install` and
+download Playwright Chromium, then get explicit approval before running
+`node scripts/bootstrap.mjs`.
+
+The CLI renderer runs in Docker; the web renderer uses the installed local
+runtime.
 
 - **CLI path:** `ghcr.io/charmbracelet/vhs` (bundles vhs + ttyd + ffmpeg +
   headless Chromium + fonts). Also `gifsicle` for GIF shrink.
